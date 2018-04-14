@@ -8,7 +8,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
 )
@@ -21,19 +20,6 @@ type SimpleAsset struct {
 // data. Note that chaincode upgrade also calls this function to reset
 // or to migrate data.
 func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
-	// Get the args from the transaction proposal
-	args := stub.GetStringArgs()
-	if len(args) != 2 {
-		return shim.Error("Incorrect arguments. Expecting a key and a value")
-	}
-
-	// Set up any variables or assets here by calling stub.PutState()
-
-	// We store the key and the value on the ledger
-	err := stub.PutState(args[0], []byte(args[1]))
-	if err != nil {
-		return shim.Error(fmt.Sprintf("Failed to create asset: %s", args[0]))
-	}
 	return shim.Success(nil)
 }
 
@@ -47,24 +33,24 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	var result string
 	var err error
 
+	fmt.Printf("Received request to call funtion %s.", fn)
 	switch fn {
+	case "init_escrow":
+			result, err = init_escrow(stub, args)
+	case "acknowledge_eth_transfer":
+			result, err = acknowledge_eth_transfer(stub, args)
+	case "acknowledge_dollar_transfer":
+			result, err = acknowledge_dollar_transfer(stub, args)
+  // Will use this function for the demo to shortcut everything
+	case "trigger_transaction":
+			result, err = trigger_transaction(stub, args)
 	case "set":
 			result, err = set(stub, args)
 	case "get":
 			result, err = get(stub, args)
-	case "register_buyer":
-			result, err = register_buyer(stub, args)
 	default:
-			fmt.Printf("Querying funtion %s.", fn)
+			fmt.Printf("Unknown function %s.", fn)
 	}
-
-
-	//if fn == "set" {
-	//	result, err = set(stub, args)
-	//} else if { // assume 'get' even if fn is nil
-	//	result, err = get(stub, args)
-	//}
-
 
 	if err != nil {
 		return shim.Error(err.Error())
@@ -104,13 +90,72 @@ func get(stub shim.ChaincodeStubInterface, args []string) (string, error) {
 	return string(value), nil
 }
 
-func register_buyer(stub shim.ChaincodeStubInterface, args []string) (string, error) {
-	if len(args) != 1 {
-		return "", fmt.Errorf("Incorrect arguments. Expecting a buyer ID")
+func init_escrow(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 4 {
+		return "", fmt.Errorf("Incorrect arguments.")
 	}
-	return set(stub, []string {"buyer", args[0]});
+	set(stub, []string {"buyer", args[0]});
+	set(stub, []string {"seller", args[1]});
+	set(stub, []string {"dollar_amount", args[2]});
+	set(stub, []string {"eth_amount", args[3]});
+	set(stub, []string {"buyer_ack", "false"});
+	set(stub, []string {"seller_ack", "false"});
+	set(stub, []string {"dollar_transfer_ready", "false"});
+	set(stub, []string {"eth_transfer_ready", "false"});
+	set(stub, []string {"transfer_done", "false"});
+	return "", nil
 }
 
+func generate_eth_contract(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	// TODO: Initialize ETH Smart generate_eth_contract using ETH GO Client
+	return "", nil
+}
+
+func acknowledge_eth_transfer(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	return set(stub, []string {"seller_ack", "true"});
+	// TODO: Trigger transfer if both seller and buyer have acked their transfers
+}
+
+func acknowledge_dollar_transfer(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	return set(stub, []string {"buyer_ack", "true"});
+	// TODO: Trigger transfer if both seller and buyer have acked their transfers
+}
+
+// Helper function to verify ETH has indeed beed transferred
+func verify_eth_transfer(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	// TODO: Query ETH smart contract to verify ETH have been transferred
+	return set(stub, []string {"eth_transfer_ready", "true"});
+}
+
+// Helper function to verify dollars  has indeed beed transferred
+func verify_dollar_transfer(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	// TODO: Query banking interface to verify USD have been transferred
+	return set(stub, []string {"dollar_transfer_ready", "true"});
+}
+
+// Function that releases the escrow
+func trigger_transaction(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+	if len(args) != 0 {
+		return "", fmt.Errorf("Incorrect arguments.")
+	}
+	// TODO: Check ETH and Dollar transactions are ready anbd trigger them
+	return set(stub, []string {"transfer_done", "true"});
+}
 
 
 // main function starts up the chaincode in the container during instantiate
