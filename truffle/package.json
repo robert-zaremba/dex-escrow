@@ -27,10 +27,8 @@
     "globals": [
       "assert",
       "artifacts",
-      "contract"
-    ],
-    "plugins": [
-      "flowtype"
+      "contract",
+      "web3"
     ]
   }
 }

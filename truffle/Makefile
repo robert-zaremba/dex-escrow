@@ -19,7 +19,7 @@ lint-sol:
 
 run-testrpc:
 	@ps -a -o args | grep "^node .*testrpc.*8544" || \
-		@ganache-cli --port 8544 --network-id 9 --gasLimit 0x669f97
+		ganache-cli --port 8544 --network-id 9 --gasLimit 0x669f97 --seed 100
 
 run-testrpc-local:
 	@ps -a -o args | grep "^node .*testrpc.*8544" || \
