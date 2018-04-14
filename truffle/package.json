@@ -1,0 +1,36 @@
+{
+  "name": "dex-escrow etherum escrow contract",
+  "version": "0.1.0",
+  "description": "",
+  "repository": "",
+  "author": "Robert Zaremba",
+  "license": "GPLv3",
+  "dependencies": {
+    "standard": "^11.0.1",
+
+    "ganache-cli": "^6.1.0",
+    "remixd": "^0.1.8",
+    "run-with-ganache": "^0.1.1",
+    "solhint": "^1.1.10",
+    "truffle": "^4.1.4"
+
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 5.0.0"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ],
+    "globals": [
+      "assert",
+      "artifacts",
+      "contract"
+    ],
+    "plugins": [
+      "flowtype"
+    ]
+  }
+}
