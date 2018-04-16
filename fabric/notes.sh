@@ -8,13 +8,12 @@ docker-compose -f docker-compose-simple.yaml up
 # On chaincode:
 # ============
 docker exec -it chaincode bash
-go build
-CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=mycc:0 ./start.sh
+go build && CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=mycc:0 ./start.sh
 
 # DEPLOY DEX:
 # ==========
 docker exec -it cli bash
-peer chaincode install -p chaincodedev/chaincode/dex -n mycc -v 0
+peer chaincode install -p chaincodedev/chaincode -n mycc -v 0
 peer chaincode instantiate -n mycc -v 0 -c '{"Args":[]}' -C myc
 
 peer chaincode invoke -n mycc -c '{"Args":["init_escrow", "guillaume", "robert", "500", "1"]}' -C myc
